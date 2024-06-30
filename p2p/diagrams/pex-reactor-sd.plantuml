@@ -1,0 +1,42 @@
+@startuml
+
+participant "Switch" as SW
+
+
+box "P2P.pex.Reactor"
+participant "AddPeer" as AP
+participant "ReceiveAddrs" as RA
+participant "SendAddrs" as SA
+participant "AddrBook" as AB
+participant "RequestAddr" as RQA
+participant "ensurePeers" as EP
+participant "dialPeer" as DP
+participant "dialSeeds" as DS
+end box
+
+participant "Peer" as PR
+
+
+
+SW -> AP: Peer (pex_reactor.go)
+AP -> RQA: Peer (addrbook.go)
+RQA -> PR: Send Pex Request p2p.Envlope (addrbook.go)
+AP -> AB: AddAddress (addrbook.go)
+
+PR -> SA: Receive Pex Request p2p.Envlope (peer.go)
+SA -> PR: Receive Pex Addr p2p.Envlope (peer.go)
+PR -> RA : Source Peer (peer.go)
+
+RA -> AB: Add Adress (peer.go)
+AB -> SA: GetSelection (addressbook.go)
+
+AB -> EP: Pick address (pex_reactor.go)
+EP -> RQA: Pick Random address (pex_reactor.go)
+EP -> DP: NetAddress (pex_reactor.go)
+EP -> DS: NoAddr get seeds  (pex_reactor.go)
+
+DP -> SW: Dial Peer with address (switch.go)
+DS -> SW: Dial Peer with address with new seed address (switch.go)
+
+
+@endtuml
