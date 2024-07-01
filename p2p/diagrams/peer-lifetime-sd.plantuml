@@ -18,52 +18,46 @@ end box
 
 participant "Reactor" as RC
 
-N -> MT: Listen (node/node.go)
-N -> AR: Start (node/node.go)
-AR -> RC : Start (p2p/switch.go)
-AR -> MT: Accept (p2p/switch.go)
-MT -> PR: newPeer (p2p/transport.go)
-PR -> MT: new Peer with connection (p2p/peer.go)
-MT -> AR: Peer With Connection (p2p/switch.go)
-AR -> AP: Peer With Connection (p2p/switch.go)
+N -> MT: Listen (node/node.go#L550)
+N -> AR: Start (node/node.go#L557)
+AR -> RC : Start (p2p/switch.go#L237)
+AR -> MT: Accept (p2p/switch.go#L635)
+MT -> PR: newPeer (p2p/transport.go#L526)
+PR -> MT: new Peer with connection (p2p/peer.go#L169)
+MT -> AR: Peer With Connection (p2p/switch.go#L635)
+AR -> AP: Peer With Connection (p2p/switch.go#L709)
 
-N -> DPA: Update Address book and Dial (p2p/transport.go)
+N -> DPA: Dial and Update Address book (node/node.go#L563)
 
-DPA ->> DPWA: address (p2p/switch.go)
+DPA ->> DPWA: address (p2p/switch.go#L534)
 
-RC ->> SPFE: onPeerError (p2p/peer.go)
+DPWA -> MT : Dial (p2p/switch.go#L740)
+MT -> MT : Upgrade Connection with\nAuthenticated Encryption Handshake (p2p/transport.go#L231)
+MT -> DPWA: Dial Success (p2p/switch.go#L740)
+DPWA -> AP: Add Active Peer (p2p/switch.go#L770)
 
-DPWA -> MT : Dial (p2p/pex/pex_reactor.go)
-MT -> MT : Upgrade Connection with\nAuthenticated Encryption Handshake (p2p/transport.go)
-MT -> DPWA: Dial Success (p2p/switch.go)
-DPWA -> AP: Add Active Peer (p2p/switch.go)
+AP -> PR: Start (p2p/switch.go#L834)
+AP -> AP: Add to peer set (p2p/switch.go#L844)
+AP -> RC: Add Peer (p2p/switch.go#L857)
 
+PR ->> RC: Receive - onreceive callback (p2p/peer.go#425)
+RC ->> PR: Send (p2p/pex/pex_ractor.go#L343)
 
-AP -> AP: Add to peer set (p2p/switch.go)
-AP -> PR: Start (p2p/switch.go)
-AP -> RC: Add Peer (p2p/switch.go)
+RC ->> SPFE: onPeerError (p2p/peer.go#L271#L282)
 
-PR ->> RC: Receive (p2p/peer.go)
-RC ->> PR: Send (p2p/peer.go)
+RC -> SPFE  : Pax address or request error (p2p/pex/pex_ractor.go#L271#L282#L288)
+SPFE ->> RTP  : addr to reconnect (p2p/switch.go#L356)
+RTP ->> DPWA : addr to reconnect (p2p/switch.go#436#412)
 
+DPWA -> MT: Dial (p2p/switch.go#L740)
+MT -> DPWA: Dial Success (p2p/transport.go#240)
+DPWA -> AP: Add Active Peer (p2p/switch.go#L844)
 
-RC -> SPFE  : RemovePeer (p2p/pex/pex_reactor.go)
-SPFE -> RTP  : addr to reconnect (p2p/switch.go)
-RTP -> DPWA : addr to reconnect (p2p/switch.go)
+AP -> RC: Add Peer (p2p/switch.go#L857)
 
-DPWA -> MT: Dial (p2p/switch.go)
-MT -> DPWA: Dial Success (p2p/transport.go)
-DPWA -> AP: Add Active Peer (p2p/switch.go)
-
-AP -> RC: Add Peer (p2p/switch.go)
-
-MT -> MT: Retry connection (p2p/transport.go)
-
-
-MT -> DPWA: ErrorPersists (p2p/transport.go)
-DPWA -> SPFE: onError (p2p/switch.go)
-
-SPFE -> PR: Stop (p2p/switch.go)
+SPFE ->> RTP: Retry connection (p2p/switch.go#356)
+SPFE -> RC: stopAndRemovePeer (p2p/switch.go#L374)
+SPFE -> PR: Stop (p2p/switch.go#369)
 
 
 

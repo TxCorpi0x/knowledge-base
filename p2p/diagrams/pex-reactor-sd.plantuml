@@ -16,27 +16,23 @@ end box
 
 participant "Peer" as PR
 
+SW -> AP: Peer (pex_reactor.go#857)
+AP -> RQA: Peer (pex_reactor.go#L197)
+RQA -> PR: Send Pex Request p2p.Envlope (addrbook.go#L343)
+AP -> AB: AddAddress (addrbook.go#L212)
 
+PR -> SA: Receive Pex Request p2p.Envlope (pex_reactor.go#L261#L275)
+SA -> PR: Receive Pex Addr p2p.Envlope (pex_reactor.go#L408)
 
-SW -> AP: Peer (pex_reactor.go)
-AP -> RQA: Peer (addrbook.go)
-RQA -> PR: Send Pex Request p2p.Envlope (addrbook.go)
-AP -> AB: AddAddress (addrbook.go)
+RA -> AB: Add Adress (pex_reactor.go#L374)
+AB -> SA: GetSelection (pex_reactor.go#L275)
 
-PR -> SA: Receive Pex Request p2p.Envlope (peer.go)
-SA -> PR: Receive Pex Addr p2p.Envlope (peer.go)
-PR -> RA : Source Peer (peer.go)
+AB -> EP: Pick address (pex_reactor.go#L479)
+EP -> DP: NetAddress (pex_reactor.go#L498)
+EP -> RQA: Pick Random address (pex_reactor.go#L518)
+EP -> DS: NoAddr get seeds  (pex_reactor.go#531)
 
-RA -> AB: Add Adress (peer.go)
-AB -> SA: GetSelection (addressbook.go)
-
-AB -> EP: Pick address (pex_reactor.go)
-EP -> RQA: Pick Random address (pex_reactor.go)
-EP -> DP: NetAddress (pex_reactor.go)
-EP -> DS: NoAddr get seeds  (pex_reactor.go)
-
-DP -> SW: Dial Peer with address (switch.go)
-DS -> SW: Dial Peer with address with new seed address (switch.go)
-
+DP -> SW: Dial Peer with address (pex_reactor.go#563)
+DS -> SW: Dial Peer with address with new seed address (switch.go#625)
 
 @endtuml
